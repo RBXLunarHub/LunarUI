@@ -1,101 +1,170 @@
-local UI_Library = {}
+local function CreateWindow()
+    local Window = Instance.new("ScreenGui")
+    Window.Name = "Window"
+    Window.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Window Class
-UI_Library.Window = {}
-UI_Library.Window.__index = UI_Library.Window
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = Window
+    MainFrame.Size = UDim2.new(0, 600, 0, 400)
+    MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    MainFrame.BorderSizePixel = 0
 
-function UI_Library.Window:CreateWindow(windowName, windowSize, windowPosition)
-    local self = setmetatable({}, UI_Library.Window)
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 10)
+    UICorner.Parent = MainFrame
 
-    -- Create the ScreenGui
-    self.screenGui = Instance.new("ScreenGui")
-    self.screenGui.Name = windowName
-    self.screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
-    -- Create the Main Frame (Window)
-    self.mainFrame = Instance.new("Frame")
-    self.mainFrame.Size = windowSize
-    self.mainFrame.Position = windowPosition
-    self.mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    self.mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)  -- White border
-    self.mainFrame.BorderSizePixel = 2
-    self.mainFrame.Parent = self.screenGui
-
-    -- Add Rounded Corners
-    local mainCorner = Instance.new("UICorner")
-    mainCorner.CornerRadius = UDim.new(0, 10)
-    mainCorner.Parent = self.mainFrame
-
-    return self
-end
-
--- Tab System
-function UI_Library.Window:CreateTab(tabName, tabSize, tabPosition)
-    -- Create a tab bar and buttons for switching
-    self.tabBar = Instance.new("Frame")
-    self.tabBar.Size = UDim2.new(0, 500, 0, 40)
-    self.tabBar.Position = UDim2.new(0, 0, 0, 40)
-    self.tabBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    self.tabBar.BorderColor3 = Color3.fromRGB(255, 255, 255)  -- White border
-    self.tabBar.BorderSizePixel = 2
-    self.tabBar.Parent = self.mainFrame
-
-    -- Create the Tab Buttons
-    local tabButton = Instance.new("TextButton")
-    tabButton.Size = UDim2.new(0, 250, 0, 40)
-    tabButton.Position = UDim2.new(0, 0, 0, 0)
-    tabButton.Text = tabName
-    tabButton.Font = Enum.Font.GothamSemibold
-    tabButton.TextSize = 18
-    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tabButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    tabButton.BorderColor3 = Color3.fromRGB(255, 255, 255)  -- White border
-    tabButton.BorderSizePixel = 2
-    tabButton.Parent = self.tabBar
-
-    -- Create the Tab Content Frame
-    self.tabFrame = Instance.new("Frame")
-    self.tabFrame.Size = tabSize
-    self.tabFrame.Position = tabPosition
-    self.tabFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    self.tabFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)  -- White border
-    self.tabFrame.BorderSizePixel = 2
-    self.tabFrame.Visible = false  -- Initially hidden
-    self.tabFrame.Parent = self.mainFrame
-
-    return self
-end
-
--- Add Button to a Tab
-function UI_Library.Window:AddButton(tab, buttonName, buttonSize, buttonPosition, callback)
-    local button = Instance.new("TextButton")
-    button.Size = buttonSize
-    button.Position = buttonPosition
-    button.Text = buttonName
-    button.Font = Enum.Font.GothamSemibold
-    button.TextSize = 18
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    button.BorderColor3 = Color3.fromRGB(255, 255, 255)  -- White border
-    button.BorderSizePixel = 2
-    button.Parent = tab.tabFrame
-
-    -- Button click action
-    button.MouseButton1Click:Connect(callback)
-
-    return self
-end
-
--- Show the Tab
-function UI_Library.Window:ShowTab(tab)
-    -- Hide all other tabs
-    for _, frame in ipairs(self.mainFrame:GetChildren()) do
-        if frame:IsA("Frame") and frame.Name ~= "tabBar" then
-            frame.Visible = false
-        end
+    -- Function to create tabs
+    local function CreateTab(tabName)
+        local Tab = Instance.new("Frame")
+        Tab.Name = tabName
+        Tab.Parent = MainFrame
+        Tab.Size = UDim2.new(0, 600, 0, 400)
+        Tab.BackgroundTransparency = 1
+        Tab.Visible = false
+        
+        local tabLabel = Instance.new("TextLabel")
+        tabLabel.Parent = Tab
+        tabLabel.Size = UDim2.new(1, 0, 0, 40)
+        tabLabel.BackgroundTransparency = 1
+        tabLabel.Text = tabName
+        tabLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabLabel.Font = Enum.Font.GothamSemibold
+        tabLabel.TextSize = 20
+        tabLabel.TextAlign = Enum.TextXAlignment.Center
+        tabLabel.Position = UDim2.new(0, 0, 0, 10)
+        
+        return Tab
     end
-    tab.tabFrame.Visible = true
+
+    -- Function to create buttons
+    local function CreateButton(parent, text, callback)
+        local Button = Instance.new("TextButton")
+        Button.Size = UDim2.new(0, 200, 0, 50)
+        Button.Position = UDim2.new(0, 50, 0, 50)
+        Button.Text = text
+        Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Button.Font = Enum.Font.GothamSemibold
+        Button.TextSize = 18
+        Button.Parent = parent
+
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 5)
+        UICorner.Parent = Button
+
+        Button.MouseButton1Click:Connect(function()
+            callback()
+        end)
+    end
+
+    -- Function to create sliders
+    local function CreateSlider(parent, min, max, defaultValue, callback)
+        local Slider = Instance.new("Frame")
+        Slider.Size = UDim2.new(0, 500, 0, 50)
+        Slider.Position = UDim2.new(0, 50, 0, 150)
+        Slider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        Slider.Parent = parent
+
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 5)
+        UICorner.Parent = Slider
+
+        local bar = Instance.new("Frame")
+        bar.Size = UDim2.new(0, 448, 0, 5)
+        bar.Position = UDim2.new(0, 25, 0, 20)
+        bar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        bar.Parent = Slider
+
+        local sliderButton = Instance.new("Frame")
+        sliderButton.Size = UDim2.new(0, 10, 0, 10)
+        sliderButton.Position = UDim2.new(0, defaultValue / max * 448, 0, -2)
+        sliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        sliderButton.Parent = bar
+
+        local TextBox = Instance.new("TextBox")
+        TextBox.Size = UDim2.new(0, 60, 0, 20)
+        TextBox.Position = UDim2.new(1, 10, 0, 10)
+        TextBox.Text = tostring(defaultValue)
+        TextBox.Parent = Slider
+        TextBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        TextBox.TextColor3 = Color3.fromRGB(225, 225, 225)
+        TextBox.Font = Enum.Font.GothamSemibold
+        TextBox.TextSize = 12
+
+        local function updateSliderPosition(newValue)
+            sliderButton.Position = UDim2.new(0, newValue / max * 448, 0, -2)
+            TextBox.Text = tostring(newValue)
+            callback(newValue)
+        end
+
+        sliderButton.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                local startPos = mouse.X - bar.AbsolutePosition.X
+                local connection
+                connection = game:GetService("UserInputService").InputChanged:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseMovement then
+                        local xPosition = math.clamp(mouse.X - bar.AbsolutePosition.X, 0, 448)
+                        updateSliderPosition(math.floor((xPosition / 448) * max))
+                    end
+                end)
+                game:GetService("UserInputService").InputEnded:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        connection:Disconnect()
+                    end
+                end)
+            end
+        end)
+    end
+
+    -- Function to create textboxes
+    local function CreateTextbox(parent, defaultValue, callback)
+        local Textbox = Instance.new("Frame")
+        Textbox.Size = UDim2.new(0, 400, 0, 40)
+        Textbox.Position = UDim2.new(0, 50, 0, 250)
+        Textbox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        Textbox.Parent = parent
+
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 5)
+        UICorner.Parent = Textbox
+
+        local TextBox = Instance.new("TextBox")
+        TextBox.Size = UDim2.new(1, -20, 0, 30)
+        TextBox.Position = UDim2.new(0, 10, 0, 5)
+        TextBox.Text = defaultValue
+        TextBox.Parent = Textbox
+        TextBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        TextBox.TextColor3 = Color3.fromRGB(225, 225, 225)
+        TextBox.Font = Enum.Font.GothamSemibold
+        TextBox.TextSize = 16
+
+        TextBox.FocusLost:Connect(function()
+            callback(TextBox.Text)
+        end)
+    end
+
+    -- Creating tabs
+    local tab1 = CreateTab("Tab 1")
+    tab1.Visible = true
+
+    -- Adding buttons, sliders, and textboxes
+    CreateButton(tab1, "Button", function()
+        print("Button clicked!")
+    end)
+
+    CreateSlider(tab1, 0, 100, 50, function(value)
+        print("Slider value:", value)
+    end)
+
+    CreateTextbox(tab1, "Default Text", function(value)
+        print("Textbox input:", value)
+    end)
+
+    return Window
 end
 
--- Return the UI Library for use
-return UI_Library
+-- Call the function to create the window
+
